@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0c11">
+  <title>🔪 KILLER — Live Party Game</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="app">
+    <section id="home" class="screen active">
+      <div class="home-card card">
+        <div class="brand">🔪 <span>KILLER</span></div>
+        <p class="muted center">Find the Killer. Don't reveal yourself.</p>
+        <input id="playerName" maxlength="15" autocomplete="off" placeholder="Your name">
+        <button id="createBtn" class="btn primary">🎮 Create Game</button>
+        <button id="showJoinBtn" class="btn ghost">🚪 Join Game</button>
+        <div id="joinPanel" class="join-panel hidden">
+          <input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="6-character room code" style="text-transform:uppercase">
+          <button id="joinBtn" class="btn primary">🚪 Join Room</button>
+        </div>
+        <p id="homeMessage" class="message-line"></p>
+      </div>
+    </section>
+
+    <section id="lobby" class="screen">
+      <div class="page card compact">
+        <div class="topline"><strong>🔪 KILLER</strong><span id="lobbyStatus">Lobby</span></div>
+        <div class="room-banner">
+          <span class="muted">ROOM CODE</span>
+          <strong id="roomCode">------</strong>
+          <button id="copyRoomBtn" class="mini-btn">📋 Copy</button>
+        </div>
+        <div class="lobby-head"><strong>👥 Players</strong><span id="playerCount">0/10</span></div>
+        <div id="playerList" class="player-list"></div>
+        <div class="actions">
+          <button id="startBtn" class="btn primary" disabled>▶️ Start Game</button>
+          <button id="leaveBtn" class="btn ghost">↩️ Leave</button>
+        </div>
+        <p class="hint">Need at least 5 players.</p>
+      </div>
+    </section>
+
+    <section id="game" class="screen">
+      <div class="game-wrap">
+        <header class="topline game-top"><strong>🔪 KILLER</strong><span id="roundText">Round 1 / 10</span></header>
+        <div id="roleCard" class="role-card"></div>
+
+        <section class="panel compact">
+          <div class="section-title"><span id="phaseIcon">🎮</span><strong id="phaseTitle">Game</strong></div>
+          <p id="phaseDescription" class="muted small"></p>
+          <div id="actionArea"></div>
+        </section>
+
+        <section class="panel compact">
+          <div class="section-title">💬 <strong>Chat</strong></div>
+          <div id="chatBox" class="chat-box" aria-live="polite"></div>
+          <div class="chat-row">
+            <input id="chatInput" maxlength="200" autocomplete="off" placeholder="Type a message...">
+            <button id="sendChatBtn" class="send-btn">➤</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="final" class="screen">
+      <div class="page card compact">
+        <div class="final-title">🏆 GAME OVER</div>
+        <p id="finalSubtitle" class="muted center">10 rounds completed.</p>
+        <div id="finalScores" class="score-list"></div>
+        <button id="backHomeBtn" class="btn ghost">🏠 Back to Home</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/script.js"></script>
+</body>
+</html>
