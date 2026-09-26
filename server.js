@@ -63,8 +63,11 @@ function chooseKiller(room) {
   // three clues can match the current names, fall back to a safe clue/player
   // pair instead of crashing the round.
   if (!valid.length) {
+    // If nobody satisfies the requested clue set, do not publish a false clue.
+    // Keep the round playable by using a neutral fallback that is true for the
+    // selected killer.
     const killer = room.players[Math.floor(Math.random() * room.players.length)];
-    return { clue: 'Killer-এর নামের 5 অক্ষরের বেশি', killer };
+    return { clue: `Killer-এর নামের মধ্যে '${killer.name[0].toUpperCase()}' আছে`, killer };
   }
   const clue = valid[Math.floor(Math.random() * valid.length)];
   const eligible = room.players.filter(p => clueMatches(clue, p.name));
@@ -264,15 +267,19 @@ io.on('connection', socket => {
     emitSystem(room, '🗳️ Voting has started.');
   });
 
-  socket.on('castVote', ({ targetId }) => {
+  socket.on('castVote', ({ targetId }, ack) => {
+    const reply = (ok, message='') => { if (typeof ack === 'function') ack({ ok, message }); };
     const room = getRoom(socket);
     const player = room && getPlayer(room, socket.data.playerId);
-    if (!room || !player || room.phase !== 'vote') return;
-    if (!player.alive || room.killerId === player.id) return emitError(socket, 'You cannot vote.');
-    if (room.votes[player.id]) return emitError(socket, 'You already voted.');
-    const target = getPlayer(room, targetId);
-    if (!target || !target.alive) return emitError(socket, 'That player is eliminated.');
+    if (!room || !player) { reply(false, 'You are not in a game.'); return; }
+    if (room.phase !== 'vote') { reply(false, 'Voting has not started.'); return; }
+    if (!player.alive || room.killerId === player.id) { reply(false, 'The Killer cannot vote.'); emitError(socket, 'You cannot vote.'); return; }
+    if (room.votes[player.id]) { reply(false, 'You already voted.'); emitError(socket, 'You already voted.'); return; }
+    const target = getPlayer(room, String(targetId || ''));
+    if (!target || !target.alive) { reply(false, 'That player is eliminated.'); emitError(socket, 'That player is eliminated.'); return; }
+    if (target.id === player.id) { reply(false, 'You cannot vote for yourself.'); emitError(socket, 'You cannot vote for yourself.'); return; }
     room.votes[player.id] = target.id;
+    reply(true, 'Vote submitted.');
     sendState(room);
     finishVoting(room);
   });
