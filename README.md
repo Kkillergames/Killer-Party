@@ -1,4 +1,4 @@
-# KILLER — Live Multiplayer
+# KILLER Party — Live Multiplayer BY NAHIYAN NAHID
 
 A small Node.js + Socket.IO multiplayer party game.
 
